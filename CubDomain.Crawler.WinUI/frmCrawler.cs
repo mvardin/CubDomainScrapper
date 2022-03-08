@@ -12,6 +12,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -63,7 +64,25 @@ namespace CubDomain.Crawler.WinUI
                                   try
                                   {
                                       string url = $"https://www.cubdomain.com/domains-registered-by-date/{date}/{page}";
-                                      chromeDriver.Navigate().GoToUrl(url);
+
+                                      string content = string.Empty;
+                                      int tryToGetContent = 0;
+                                      while (tryToGetContent < 5)
+                                      {
+                                          try
+                                          {
+                                              tryToGetContent++;
+                                              chromeDriver.Navigate().GoToUrl(url);
+                                              content = chromeDriver.PageSource;
+                                              break;
+                                          }
+                                          catch (Exception ex)
+                                          {
+                                              log("page navigating", ex);
+                                              Thread.Sleep(5 * 1000);
+                                          }
+                                      }
+
 
                                       if (!chromeDriver.PageSource.Contains("Error 404"))
                                       {
@@ -78,21 +97,28 @@ namespace CubDomain.Crawler.WinUI
                                               }
                                           }
 
-                                          string dataRow = htmlDocument.DocumentNode.SelectNodes("/html/body/div[2]/div[1]/section/div[3]").FirstOrDefault().InnerText;
+                                          var dataRowEl = htmlDocument.DocumentNode.SelectNodes("/html/body/div[2]/div[1]/section/div[3]").FirstOrDefault();
+                                          if (dataRowEl == null)
+                                          {
+                                              log("dataRowEl is null");
+                                              continue;
+                                          }
 
+                                          string dataRow = dataRowEl.InnerText;
                                           string[] domainArray = dataRow.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).Where(a => a != null && !string.IsNullOrEmpty(a.Trim())).ToArray();
 
                                           if (domainArray.Length == 0)
                                           {
+                                              log("domainArray is empty");
                                               break;
                                           }
 
                                           string query = string.Empty;
                                           foreach (var domain in domainArray)
                                           {
-                                              string domainString = domain.Trim().ToLower();
                                               try
                                               {
+                                                  string domainString = domain.Trim().ToLower();
                                                   query += "INSERT INTO [dbo].[CDomain]([Domain],[RegisterDate],[Extention],[InsertUserAccountId],[InsertDateTime],[UpdateUserAccountId],[UpdateDateTime])" +
                                                   $"VALUES('{domainString}','{currentDate}','{Path.GetExtension(domainString)}','{Guid.Empty}','{DateTime.Now}','{Guid.Empty}','{DateTime.Now}')" +
                                                   $"\r\n";
@@ -110,14 +136,15 @@ namespace CubDomain.Crawler.WinUI
                                           int rows = cDomainService.SaveDomains(query);
                                           log(date + " - " + page + " - " + rows + " saved");
                                       }
-                                      else break;
+                                      else
+                                      {
+                                          log(date + " - " + page + " - ERROR404");
+                                          break;
+                                      };
                                   }
                                   catch (Exception ex)
                                   {
-                                      if (MessageBox.Show("error?" + ex.Message) == DialogResult.OK)
-                                      {
-
-                                      }
+                                      log("while", ex);
                                   }
                                   page++;
                               }
