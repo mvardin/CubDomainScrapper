@@ -1,6 +1,8 @@
 using CubDomain.Crawler.Data;
 using CubDomain.Crawler.Data;
 using CubDomain.Crawler.BO;
+using System.Collections.Generic;
+using System;
 
 namespace CubDomain.Crawler.Service
 {
@@ -11,9 +13,9 @@ namespace CubDomain.Crawler.Service
         {
 
         }
-        public int SaveDomains(string query)
+        public int SaveDomains(string[] domains, DateTime registerDate)
         {
-            return new CDomainData().SaveDomains(query);
+            return new CDomainData().SaveDomains(domains, registerDate);
         }
     }
 }

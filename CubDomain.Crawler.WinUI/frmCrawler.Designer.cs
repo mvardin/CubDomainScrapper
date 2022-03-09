@@ -30,8 +30,6 @@
         {
             this.btnStart = new System.Windows.Forms.Button();
             this.lbLog = new System.Windows.Forms.ListBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.lblDomainCount = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.txtStartDate = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
@@ -57,24 +55,6 @@
             this.lbLog.Size = new System.Drawing.Size(776, 394);
             this.lbLog.TabIndex = 1;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(114, 17);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(51, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Domains:";
-            // 
-            // lblDomainCount
-            // 
-            this.lblDomainCount.AutoSize = true;
-            this.lblDomainCount.Location = new System.Drawing.Point(171, 17);
-            this.lblDomainCount.Name = "lblDomainCount";
-            this.lblDomainCount.Size = new System.Drawing.Size(13, 13);
-            this.lblDomainCount.TabIndex = 2;
-            this.lblDomainCount.Text = "0";
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -98,8 +78,6 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.txtStartDate);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.lblDomainCount);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.lbLog);
             this.Controls.Add(this.btnStart);
             this.Name = "frmCrawler";
@@ -113,8 +91,6 @@
 
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.ListBox lbLog;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label lblDomainCount;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtStartDate;
     }

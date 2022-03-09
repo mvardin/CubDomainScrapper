@@ -1,4 +1,5 @@
-﻿using CubDomain.Crawler.Service;
+﻿using CubDomain.Crawler.BO;
+using CubDomain.Crawler.Service;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.Collections.Generic;
@@ -113,33 +114,16 @@ namespace CubDomain.Crawler.WinUI
                                               break;
                                           }
 
-                                          string query = string.Empty;
-                                          foreach (var domain in domainArray)
-                                          {
-                                              try
-                                              {
-                                                  string domainString = domain.Trim().ToLower();
-                                                  query += "INSERT INTO [dbo].[CDomain]([Domain],[RegisterDate],[Extention],[InsertUserAccountId],[InsertDateTime],[UpdateUserAccountId],[UpdateDateTime])" +
-                                                  $"VALUES('{domainString}','{currentDate}','{Path.GetExtension(domainString)}','{Guid.Empty}','{DateTime.Now}','{Guid.Empty}','{DateTime.Now}')" +
-                                                  $"\r\n";
-                                                  lblDomainCount.Invoke((MethodInvoker)delegate
-                                                  {
-                                                      lblDomainCount.Text = (Convert.ToInt32(lblDomainCount.Text) + 1).ToString();
-                                                  });
-                                              }
-                                              catch (Exception ex)
-                                              {
-                                                  log("SaveDomain", ex);
-                                              }
-                                          }
                                           int tryCount = 1;
                                           while (true)
                                           {
                                               try
                                               {
+                                                  DateTime dtStart = DateTime.Now;
                                                   var cDomainService = new CDomainService();
-                                                  int rows = cDomainService.SaveDomains(query);
-                                                  log(date + " - " + page + " - " + rows + " saved");
+                                                  int rows = cDomainService.SaveDomains(domainArray, currentDate);
+                                                  var timeElapsed = DateTime.Now.Subtract(dtStart).TotalSeconds;
+                                                  log(date + " - " + page + " - " + rows + " saved in " + timeElapsed + " seconds");
                                                   break;
                                               }
                                               catch (Exception ex)
