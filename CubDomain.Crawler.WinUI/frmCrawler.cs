@@ -132,9 +132,22 @@ namespace CubDomain.Crawler.WinUI
                                                   log("SaveDomain", ex);
                                               }
                                           }
-                                          var cDomainService = new CDomainService();
-                                          int rows = cDomainService.SaveDomains(query);
-                                          log(date + " - " + page + " - " + rows + " saved");
+                                          int tryCount = 1;
+                                          while (true)
+                                          {
+                                              try
+                                              {
+                                                  var cDomainService = new CDomainService();
+                                                  int rows = cDomainService.SaveDomains(query);
+                                                  log(date + " - " + page + " - " + rows + " saved");
+                                                  break;
+                                              }
+                                              catch (Exception ex)
+                                              {
+                                                  log("save:try " + tryCount, ex);
+                                                  tryCount++;
+                                              }
+                                          }
                                       }
                                       else
                                       {
