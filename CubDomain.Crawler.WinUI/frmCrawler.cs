@@ -164,6 +164,145 @@ namespace CubDomain.Crawler.WinUI
                   }
               });
         }
+        private void btnUpdating_Click(object sender, EventArgs e)
+        {
+            Task.Run(() =>
+            {
+                //TODO
+                try
+                {
+                    btnUpdating.Invoke((MethodInvoker)delegate
+                    {
+                        btnUpdating.Enabled = false;
+                        btnUpdating.Text = "Working ...";
+                    });
+
+                    DateTime currentDate = DateTime.Now;
+
+                    CDomainService domainService = new CDomainService();
+                    if (!string.IsNullOrEmpty(txtStartDate.Text))
+                    {
+                        currentDate = DateTime.Parse(txtStartDate.Text);
+                    }
+                    else
+                    {
+                        var last = domainService.GetSync(true, a => a.Domain != null, o => o.OrderBy(a => a.RegisterDate), string.Empty, 1).FirstOrDefault();
+                        if (last != null)
+                            currentDate = last.RegisterDate;
+                    }
+
+                    ChromeDriver chromeDriver = GetChromeDriver();
+                    if (MessageBox.Show("okey?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        while (currentDate.Subtract(DateTime.Parse("2018-05-07")).TotalDays > 0)
+                        {
+                            currentDate = currentDate.AddDays(-1);
+                            string date = currentDate.ToString("yyyy-MM-dd");
+                            int page = 1;
+                            while (true)
+                            {
+                                try
+                                {
+                                    string url = $"https://www.cubdomain.com/domains-registered-by-date/{date}/{page}";
+
+                                    string content = string.Empty;
+                                    int tryToGetContent = 0;
+                                    while (tryToGetContent < 5)
+                                    {
+                                        try
+                                        {
+                                            tryToGetContent++;
+                                            chromeDriver.Navigate().GoToUrl(url);
+                                            content = chromeDriver.PageSource;
+                                            break;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            log("page navigating", ex);
+                                            Thread.Sleep(5 * 1000);
+                                        }
+                                    }
+
+
+                                    if (!chromeDriver.PageSource.Contains("Error 404"))
+                                    {
+                                        HtmlAgilityPack.HtmlDocument htmlDocument = new HtmlAgilityPack.HtmlDocument();
+                                        htmlDocument.LoadHtml(chromeDriver.PageSource);
+
+                                        if (chromeDriver.PageSource.Contains("Attention Required! | Cloudflare"))
+                                        {
+                                            if (MessageBox.Show("captcha?") == DialogResult.OK)
+                                            {
+
+                                            }
+                                        }
+
+                                        var dataRowEl = htmlDocument.DocumentNode.SelectNodes("/html/body/div[2]/div[1]/section/div[3]").FirstOrDefault();
+                                        if (dataRowEl == null)
+                                        {
+                                            log("dataRowEl is null");
+                                            continue;
+                                        }
+
+                                        string dataRow = dataRowEl.InnerText;
+                                        string[] domainArray = dataRow.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).Where(a => a != null && !string.IsNullOrEmpty(a.Trim())).ToArray();
+
+                                        if (domainArray.Length == 0)
+                                        {
+                                            log("domainArray is empty");
+                                            break;
+                                        }
+
+                                        int tryCount = 1;
+                                        while (true)
+                                        {
+                                            try
+                                            {
+                                                DateTime dtStart = DateTime.Now;
+                                                var cDomainService = new CDomainService();
+                                                int rows = cDomainService.SaveDomains(domainArray, currentDate);
+                                                var timeElapsed = DateTime.Now.Subtract(dtStart).TotalSeconds;
+                                                log(date + " - " + page + " - " + rows + " saved in " + timeElapsed + " seconds");
+                                                break;
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                log("save:try " + tryCount, ex);
+                                                tryCount++;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        log(date + " - " + page + " - ERROR404");
+                                        break;
+                                    };
+                                }
+                                catch (Exception ex)
+                                {
+                                    log("while", ex);
+                                }
+                                page++;
+                            }
+                        }
+                    }
+                    btnUpdating.Invoke((MethodInvoker)delegate
+                    {
+                        btnUpdating.Enabled = true;
+                        btnUpdating.Text = "Start";
+                    });
+                }
+                catch (Exception ex)
+                {
+                    log("main", ex);
+                    btnStart.Invoke((MethodInvoker)delegate
+                    {
+                        btnUpdating.Enabled = true;
+                        btnUpdating.Text = "Start";
+                    });
+                }
+            });
+        }
         private void log(string message, Exception ex = null)
         {
             lbLog.Invoke((MethodInvoker)delegate
@@ -217,5 +356,6 @@ namespace CubDomain.Crawler.WinUI
                 return null;
             }
         }
+
     }
 }

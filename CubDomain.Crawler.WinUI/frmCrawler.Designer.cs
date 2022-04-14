@@ -32,15 +32,16 @@
             this.lbLog = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.txtStartDate = new System.Windows.Forms.TextBox();
+            this.btnUpdating = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnStart
             // 
             this.btnStart.Location = new System.Drawing.Point(12, 12);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(75, 23);
+            this.btnStart.Size = new System.Drawing.Size(103, 23);
             this.btnStart.TabIndex = 0;
-            this.btnStart.Text = "Start";
+            this.btnStart.Text = "Total crawling";
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
@@ -71,6 +72,16 @@
             this.txtStartDate.Size = new System.Drawing.Size(100, 20);
             this.txtStartDate.TabIndex = 4;
             // 
+            // btnUpdating
+            // 
+            this.btnUpdating.Location = new System.Drawing.Point(121, 12);
+            this.btnUpdating.Name = "btnUpdating";
+            this.btnUpdating.Size = new System.Drawing.Size(103, 23);
+            this.btnUpdating.TabIndex = 0;
+            this.btnUpdating.Text = "Updating";
+            this.btnUpdating.UseVisualStyleBackColor = true;
+            this.btnUpdating.Click += new System.EventHandler(this.btnUpdating_Click);
+            // 
             // frmCrawler
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -79,6 +90,7 @@
             this.Controls.Add(this.txtStartDate);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lbLog);
+            this.Controls.Add(this.btnUpdating);
             this.Controls.Add(this.btnStart);
             this.Name = "frmCrawler";
             this.Text = "Cub Domain Crawler";
@@ -93,6 +105,7 @@
         private System.Windows.Forms.ListBox lbLog;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtStartDate;
+        private System.Windows.Forms.Button btnUpdating;
     }
 }
 
